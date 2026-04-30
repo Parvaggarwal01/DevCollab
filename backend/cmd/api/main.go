@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"devcollab/database"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -13,6 +14,10 @@ func main() {
 	if err != nil {
 		log.Println("NO .env found")
 	}
+
+	database.Connect()
+
+	defer database.Close()
 
 	router := gin.Default()
 
