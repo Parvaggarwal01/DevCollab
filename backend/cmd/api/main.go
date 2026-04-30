@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"devcollab/database"
+	"devcollab/internal/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -26,6 +27,11 @@ func main() {
 			"message": "DevCollab API is Running!",
 		})
 	})
+
+	authGroup := router.Group("/api/auth")
+	{
+		authGroup.POST("/register", auth.Register)
+	}
 
 	log.Println("Server is starting on port 8080...")
 	router.Run(":8080")
