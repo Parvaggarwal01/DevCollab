@@ -31,6 +31,7 @@ func main() {
 	authGroup := router.Group("/api/auth")
 	{
 		authGroup.POST("/register", auth.Register)
+		authGroup.POST("/login", auth.Login)
 	}
 
 	log.Println("Server is starting on port 8080...")

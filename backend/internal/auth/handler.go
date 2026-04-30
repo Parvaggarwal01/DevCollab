@@ -34,3 +34,20 @@ func Register(c *gin.Context) {
 		"user": user,
 	})
 }
+
+func Login(c *gin.Context) {
+	var req LoginRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
+		return
+	}
+
+	res, err := LoginUser(c.Request.Context(), req)
+	if err != nil {
+		log.Printf("Login Error: %v\n", err)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
