@@ -34,6 +34,19 @@ func main() {
 		authGroup.POST("/login", auth.Login)
 	}
 
+	apiGroup := router.Group("/api")
+	apiGroup.Use(auth.Protect())
+	{
+		apiGroup.GET("/me", func(c *gin.Context) {
+			userID, _ := c.Get("userID")
+
+			c.JSON(http.StatusOK, gin.H{
+				"message": "You are securely authenticated!",
+				"user_id": userID,
+			})
+		})
+	}
+
 	log.Println("Server is starting on port 8080...")
 	router.Run(":8080")
 }

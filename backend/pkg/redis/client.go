@@ -14,7 +14,6 @@ var Client *redis.Client
 
 func Connect() {
 	redisURL := configs.Env.RedisUrl
-	fmt.Println(redisURL)
 	if redisURL == "" {
 		log.Fatal("REDIS_URL is not set")
 	}
