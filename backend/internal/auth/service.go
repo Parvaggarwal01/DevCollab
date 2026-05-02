@@ -71,7 +71,7 @@ func LoginUser(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
 	if err != nil {
 		return nil, errors.New("invalid email or password")
 	}
-	user = nil
+
 	if user == nil {
 		return nil, errors.New("User is nil")
 	}
