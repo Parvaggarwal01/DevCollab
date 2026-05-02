@@ -9,7 +9,7 @@ func CreateUser(ctx context.Context, email string, hashedPassword string) (*User
 	query := `
 					INSERT INTO users (email, password_hash)
 					VALUES ($1, $2)
-					RETURNING id, email, created_at, updated_at
+					RETURNING id, email, is_verified, created_at, updated_at
 	`
 
 	var user User
@@ -17,6 +17,7 @@ func CreateUser(ctx context.Context, email string, hashedPassword string) (*User
 	err := database.Pool.QueryRow(ctx, query, email, hashedPassword).Scan(
 		&user.ID,
 		&user.Email,
+		&user.IsVerified,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -28,9 +29,19 @@ func CreateUser(ctx context.Context, email string, hashedPassword string) (*User
 
 }
 
+func UpdateUserVerification(ctx context.Context, email string) error {
+	query := `
+					UPDATE users
+					SET is_verified = true, updated_at = NOW()
+					WHERE email = $1
+	`
+	_, err := database.Pool.Exec(ctx, query, email)
+	return err
+}
+
 func GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	query := `
-					SELECT id, email, password_hash, created_at, updated_at
+					SELECT id, email, password_hash, is_verified, created_at, updated_at
 					FROM users
 					WHERE email = $1
 	`
@@ -40,6 +51,7 @@ func GetUserByEmail(ctx context.Context, email string) (*User, error) {
 		&user.ID,
 		&user.Email,
 		&user.PasswordHash,
+		&user.IsVerified,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)

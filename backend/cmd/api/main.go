@@ -6,19 +6,18 @@ import (
 
 	"devcollab/database"
 	"devcollab/internal/auth"
+	"devcollab/pkg/redis"
+
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("NO .env found")
-	}
 
 	database.Connect()
 
 	defer database.Close()
+
+	redis.Connect()
 
 	router := gin.Default()
 
@@ -31,6 +30,7 @@ func main() {
 	authGroup := router.Group("/api/auth")
 	{
 		authGroup.POST("/register", auth.Register)
+		authGroup.POST("/verifyotp", auth.Verify)
 		authGroup.POST("/login", auth.Login)
 	}
 

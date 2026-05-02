@@ -1,14 +1,14 @@
 package jwt
 
 import (
-	"os"
+	"devcollab/configs"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 func GenerateToken(userID string) (string, error) {
-	secretKey := []byte(os.Getenv("JWT_SECRET"))
+	secretKey := configs.Env.JwtSecret
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": userID,

@@ -2,10 +2,10 @@ package database
 
 import (
 	"context"
+	"devcollab/configs"
 	"fmt"
 	"log"
-	"os"
-	// "time"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -13,15 +13,15 @@ import (
 var Pool *pgxpool.Pool
 
 func Connect() {
-	dbURL := os.Getenv("DATABASE_URL")
+	dbURL := configs.Env.DatabaseUrl
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL is not set in .env file")
 	}
 	var err error
 
-	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-	Pool, err = pgxpool.New(context.Background(), dbURL)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	Pool, err = pgxpool.New(ctx, dbURL)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
