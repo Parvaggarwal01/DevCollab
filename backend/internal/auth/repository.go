@@ -61,3 +61,13 @@ func GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	}
 	return &user, nil
 }
+
+func UpdateUserPassword(ctx context.Context, email string, newHashedPassword string) error {
+	query := `
+					UPDATE users
+					SET password_hash = $2, updated_at = NOW()
+					WHERE email = $1
+	`
+	_, err := database.Pool.Exec(ctx, query, email, newHashedPassword)
+	return err
+}

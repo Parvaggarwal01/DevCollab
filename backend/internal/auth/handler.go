@@ -41,12 +41,12 @@ func Verify(c *gin.Context) {
 		return
 	}
 
-	 if err := VerifyOtp(c.Request.Context(), req); err != nil {
+	if err := VerifyOtp(c.Request.Context(), req); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
-	 }
+	}
 
-	 c.JSON(http.StatusOK, gin.H{"message": "Email Succesfully verified"})
+	c.JSON(http.StatusOK, gin.H{"message": "Email Succesfully verified"})
 
 }
 
@@ -65,4 +65,39 @@ func Login(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, res)
+}
+
+func ForgotPassword(c *gin.Context) {
+	var req ForgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Inavlid request format"})
+		return
+	}
+
+	err := RequestPasswordReset(c.Request.Context(), req)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "If an account with this email exists, a password reset code has been sent."})
+
+}
+
+func ResetPasswordHandler(c *gin.Context) {
+	var req ResetPasswordResponse
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Inavlid request format"})
+		return
+	}
+
+	err := ResetPassword(c.Request.Context(), req)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Password Successfully Reset. You can log in."})
+
 }

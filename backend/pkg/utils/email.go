@@ -36,3 +36,33 @@ func SendOTPEmail(toEmail, otp string) error {
 
 	return smtp.SendMail(address, auth, from, []string{toEmail}, message)
 }
+
+func SendPasswordResetEmail(toEmail, otp string) error {
+	from := configs.Env.SmtpUser
+	password := configs.Env.SmtpPassword
+	port := configs.Env.SmtpPort
+	host := configs.Env.SmtpHost
+
+	subject := "Subject: Reset your DevCollab Password\n"
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+
+	body := fmt.Sprintf(`
+		<html>
+		<body style="font-family: Arial, sans-serif; padding: 20px;">
+			<h2>Password Reset Request</h2>
+			<p>We received a request to reset the password for your DevCollab account. Your authorization code is:</p>
+			<div style="background-color: #f4f4f4; padding: 15px; font-size: 24px; font-weight: bold; letter-spacing: 5px; text-align: center; border-radius: 8px; width: fit-content;">
+				%s
+			</div>
+			<p style="color: #888; font-size: 12px; margin-top: 20px;">If you did not request this, please ignore this email. This code expires in 15 minutes.</p>
+		</body>
+		</html>
+	`, otp)
+
+	message := []byte(subject + mime + body)
+	auth := smtp.PlainAuth("", from, password, host)
+
+	address := fmt.Sprintf("%s:%s", host, port)
+
+	return smtp.SendMail(address, auth, from, []string{toEmail}, message)
+}

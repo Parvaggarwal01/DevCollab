@@ -32,6 +32,8 @@ func main() {
 		authGroup.POST("/register", auth.Register)
 		authGroup.POST("/verifyotp", auth.Verify)
 		authGroup.POST("/login", auth.Login)
+		authGroup.POST("/forgot-password", auth.ForgotPassword)
+		authGroup.POST("/reset-password", auth.ResetPasswordHandler)
 	}
 
 	apiGroup := router.Group("/api")

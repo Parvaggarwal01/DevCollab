@@ -7,9 +7,9 @@ import (
 	"devcollab/pkg/redis"
 	"devcollab/pkg/utils"
 	"errors"
+	"fmt"
 	"log"
 	"time"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -90,9 +90,68 @@ func LoginUser(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
 		return nil, errors.New("failed to generate token")
 	}
 
-
 	return &LoginResponse{
 		Token: token,
 		User:  *user,
 	}, nil
+}
+
+func RequestPasswordReset(ctx context.Context, req ForgotPasswordRequest) error {
+	user, err := GetUserByEmail(ctx, req.Email)
+	if err != nil || user == nil {
+		return nil
+	}
+
+	if !user.IsVerified {
+		return errors.New("Please Verify Your Email Address")
+	}
+
+	otp := utils.GenerateOTP()
+
+	if otp == "" {
+		return errors.New("failed to Generate OTP")
+	}
+
+	redisKey := "reset_otp:" + req.Email
+	err = redis.Client.Set(ctx, redisKey, otp, 15*time.Minute).Err()
+	if err != nil {
+		log.Printf("Redis Error: Failed to Save reset OTP for %s: %v", req.Email, err)
+		return errors.New("Internal Server Error")
+	}
+
+	err = utils.SendPasswordResetEmail(req.Email, otp)
+	if err != nil {
+		log.Printf("Email Error: Failed to Send Reset Email %s: %v", req.Email, err)
+		return errors.New("failed to send email")
+	}
+
+	return nil
+}
+
+func ResetPassword(ctx context.Context, req ResetPasswordResponse) error {
+	redisKey := "reset_otp:" + req.Email
+	savedOTP, err := redis.Client.Get(ctx, redisKey).Result()
+	if err != nil {
+		return errors.New("Invalid or Expired OTP")
+	}
+
+	if savedOTP != req.OTP {
+		return errors.New("Incorrect OTP")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+
+	if err != nil {
+		return errors.New("Failed to Secure New Password")
+	}
+
+	err = UpdateUserPassword(ctx, req.Email, string(hashedPassword))
+
+	if err != nil {
+		return errors.New("Failed to Update Password")
+	}
+
+	redis.Client.Del(ctx, redisKey)
+
+	return nil
 }
