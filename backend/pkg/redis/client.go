@@ -18,7 +18,6 @@ func Connect() {
 		log.Fatal("REDIS_URL is not set")
 	}
 
-
 	opt, err := redis.ParseURL(redisURL)
 	if err != nil {
 		log.Fatalf("Failed to Parse REDIS URL : %v", err)

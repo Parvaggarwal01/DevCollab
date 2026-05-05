@@ -48,6 +48,7 @@ func main() {
 				"user_id": userID,
 			})
 		})
+		apiGroup.POST("/auth/logout", auth.Logout)
 	}
 
 	log.Println("Server is starting on port 8080...")

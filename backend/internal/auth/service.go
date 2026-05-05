@@ -115,7 +115,7 @@ func RefreshTokens(ctx context.Context, req RefreshRequest) (*RefreshResponse, e
 		return nil, errors.New("Unauthorized: Token revoked")
 	}
 
-	newAccessToken, newRefreshToken, err :=	jwt.GenerateToken(userID)
+	newAccessToken, newRefreshToken, err := jwt.GenerateToken(userID)
 	if err != nil {
 		return nil, errors.New("Failed to generate new tokens")
 	}
@@ -126,7 +126,7 @@ func RefreshTokens(ctx context.Context, req RefreshRequest) (*RefreshResponse, e
 	}
 
 	return &RefreshResponse{
-		Token: newAccessToken,
+		Token:        newAccessToken,
 		RefreshToken: newRefreshToken,
 	}, nil
 }
@@ -193,6 +193,18 @@ func ResetPassword(ctx context.Context, req ResetPasswordResponse) error {
 
 	redis.Client.Del(ctx, redisKey)
 	redis.Client.Del(ctx, "refresh_token:"+user.ID)
+
+	return nil
+}
+
+func LogoutUser(ctx context.Context, userID string) error {
+	redisKey := "refresh_token:" + userID
+
+	err := redis.Client.Del(ctx, redisKey).Err()
+
+	if err != nil {
+		return errors.New("Failed to Logout user")
+	}
 
 	return nil
 }
