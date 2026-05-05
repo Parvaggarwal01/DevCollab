@@ -34,6 +34,7 @@ func main() {
 		authGroup.POST("/login", auth.Login)
 		authGroup.POST("/forgot-password", auth.ForgotPassword)
 		authGroup.POST("/reset-password", auth.ResetPasswordHandler)
+		authGroup.POST("/refresh", auth.RefreshToken)
 	}
 
 	apiGroup := router.Group("/api")

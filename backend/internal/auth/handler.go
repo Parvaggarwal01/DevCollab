@@ -88,7 +88,7 @@ func ForgotPassword(c *gin.Context) {
 func ResetPasswordHandler(c *gin.Context) {
 	var req ResetPasswordResponse
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Inavlid request format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
 		return
 	}
 
@@ -100,4 +100,19 @@ func ResetPasswordHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Password Successfully Reset. You can log in."})
 
+}
+
+func RefreshToken(c *gin.Context) {
+	var req RefreshRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
+		return
+	}
+
+	res, err := RefreshTokens(c.Request.Context(), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, res)
 }

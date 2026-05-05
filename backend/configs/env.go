@@ -17,7 +17,8 @@ type env struct {
 	DatabaseUrl string
 	RedisUrl    string
 
-	JwtSecret []byte
+	JwtSecret        []byte
+	JwtRefreshSecret []byte
 }
 
 var Env *env
@@ -39,7 +40,8 @@ func init() {
 			DatabaseUrl: os.Getenv("DATABASE_URL"),
 			RedisUrl:    os.Getenv("REDIS_URL"),
 
-			JwtSecret: []byte(os.Getenv("JWT_SECRET")),
+			JwtSecret:        []byte(os.Getenv("JWT_SECRET")),
+			JwtRefreshSecret: []byte(os.Getenv("JWT_REFRESH_SECRET")),
 		}
 	})
 }
