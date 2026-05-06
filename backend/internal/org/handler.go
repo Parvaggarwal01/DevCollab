@@ -2,13 +2,14 @@ package org
 
 import (
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
 func CreateOrg(c *gin.Context) {
 	userIDValue, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unathurized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 	userID := userIDValue.(string)
@@ -26,4 +27,20 @@ func CreateOrg(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, res)
+}
+
+func GetUserOrgs(c *gin.Context) {
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	userID := userIDValue.(string)
+
+	orgs, err := GetUserOrganizations(c.Request.Context(), userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"organizations": orgs})
 }

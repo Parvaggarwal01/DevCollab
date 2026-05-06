@@ -48,3 +48,46 @@ func CreateOrganization(ctx context.Context, userID string, name string) (*Organ
 	return &org, nil
 
 }
+
+func GetOrganizationsByUserID(ctx context.Context, userID string) ([]UserOrgResponse, error) {
+	query := `
+				SELECT
+								o.id, o.name, o.created_at, o.updated_at,
+								om.role, om.joined_at
+				FROM organizations o
+				JOIN organization_members om ON o.id = om.org_id
+				WHERE om.user_id = $1
+				ORDER BY o.created_at DESC
+	`
+
+	rows, err := database.Pool.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var orgs = make([]UserOrgResponse, 0)
+
+	for rows.Next() {
+		var org UserOrgResponse
+		err := rows.Scan(
+			&org.Organization.ID,
+			&org.Organization.Name,
+			&org.Organization.CreatedAt,
+			&org.Organization.UpdatedAt,
+			&org.Role,
+			&org.JoinedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		orgs = append(orgs, org)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return orgs, nil
+}

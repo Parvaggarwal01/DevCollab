@@ -10,10 +10,10 @@ type Organization struct {
 }
 
 type OrgMember struct {
-	OrdID     string    `json:"org_id"`
-	UserID    string    `json:"user_id"`
-	Role      string    `json:"role"`
-	Joined_At time.Time `json:"joined_at"`
+	OrdID    string    `json:"org_id"`
+	UserID   string    `json:"user_id"`
+	Role     string    `json:"role"`
+	JoinedAt time.Time `json:"joined_at"`
 }
 
 type OrgInvitation struct {
@@ -40,4 +40,10 @@ type InviteUserRequest struct {
 type CreateOrgResponse struct {
 	Organization Organization `json:"organization"`
 	Role         string       `json:"role"`
+}
+
+type UserOrgResponse struct {
+	Organization Organization `json:"organization"`
+	Role         string       `json:"role"`
+	JoinedAt     time.Time    `json:"joined_at"`
 }

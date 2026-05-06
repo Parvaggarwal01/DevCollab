@@ -52,6 +52,8 @@ func main() {
 		apiGroup.POST("/auth/logout", auth.Logout)
 
 		apiGroup.POST("/orgs", org.CreateOrg)
+
+		apiGroup.GET("/orgs", org.GetUserOrgs)
 	}
 
 	log.Println("Server is starting on port 8080...")
