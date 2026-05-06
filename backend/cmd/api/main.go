@@ -6,6 +6,7 @@ import (
 
 	"devcollab/database"
 	"devcollab/internal/auth"
+	"devcollab/internal/org"
 	"devcollab/pkg/redis"
 
 	"github.com/gin-gonic/gin"
@@ -49,6 +50,8 @@ func main() {
 			})
 		})
 		apiGroup.POST("/auth/logout", auth.Logout)
+
+		apiGroup.POST("/orgs", org.CreateOrg)
 	}
 
 	log.Println("Server is starting on port 8080...")
