@@ -14,7 +14,7 @@ func CreateUser(ctx context.Context, firstName, lastName, email string, hashedPa
 
 	var user User
 
-	err := database.Pool.QueryRow(ctx, query, email, hashedPassword).Scan(
+	err := database.Pool.QueryRow(ctx, query,firstName, lastName, email, hashedPassword).Scan(
 		&user.ID,
 		&user.FirstName,
 		&user.LastName,
