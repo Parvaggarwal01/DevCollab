@@ -47,3 +47,7 @@ type UserOrgResponse struct {
 	Role         string       `json:"role"`
 	JoinedAt     time.Time    `json:"joined_at"`
 }
+
+type JoinOrgrequest struct {
+	Token string `json:"token" binding:"required"`
+}

@@ -118,3 +118,53 @@ func CreateInvitation(ctx context.Context, orgID, inviterID, email, role, token 
 	_, err := database.Pool.Exec(ctx, query, orgID, inviterID, email, role, token, expiresAt)
 	return err
 }
+
+func GetInvitationByToken(ctx context.Context, token string) (*OrgInvitation, error) {
+	var inv OrgInvitation
+	query := `
+				SELECT id, org_id, email, role, status, expires_at
+				FROM organization_invitations
+				WHERE token = $1
+	`
+	err := database.Pool.QueryRow(ctx, query, token).Scan(
+		&inv.ID,
+		&inv.OrgID,
+		&inv.Email,
+		&inv.Role,
+		&inv.Status,
+		&inv.ExpiredAt,
+	)
+	return &inv, err
+}
+
+func AcceptInvitation(ctx context.Context, inviteID string, orgID string, userID string, role string) error {
+	tx, err := database.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	memberQuery := `
+							INSERT INTO organization_members (org_id, user_id, role)
+							VALUES ($1, $2, $3)
+							ON CONFLICT (org_id, user_id) DO NOTHING
+	`
+
+	_, err = tx.Exec(ctx, memberQuery, orgID, userID, role)
+	if err != nil {
+		return err
+	}
+
+	updateQuery := `
+							UPDATE organization_invitations
+							SET status = 'accepted'
+							WHERE id = $1
+	`
+
+	_, err = tx.Exec(ctx, updateQuery, inviteID)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
+}

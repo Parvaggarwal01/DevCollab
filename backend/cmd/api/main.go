@@ -55,6 +55,7 @@ func main() {
 		apiGroup.POST("/orgs", org.CreateOrg)
 		apiGroup.GET("/orgs", org.GetUserOrgs)
 		apiGroup.POST("/orgs/:id/invite", org.InviteUser)
+		apiGroup.POST("/orgs/join", org.JoinOrg)
 	}
 
 	log.Println("Server is starting on port 8080...")

@@ -69,3 +69,27 @@ func InviteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Invitation Send Successfully"})
 }
+
+func JoinOrg(c *gin.Context) {
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	userID := userIDValue.(string)
+
+	var req JoinOrgrequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Request Format"})
+		return
+	}
+
+	err := JoinOrganization(c.Request.Context(), userID, req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully Joined the organization!"})
+}

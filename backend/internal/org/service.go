@@ -30,7 +30,7 @@ func GetUserOrganizations(ctx context.Context, userID string) ([]UserOrgResponse
 }
 
 func InviteUserToOrg(ctx context.Context, inviterID string, orgID string, req InviteUserRequest) error {
-	role, err:= GetMemberRole(ctx, orgID, inviterID)
+	role, err := GetMemberRole(ctx, orgID, inviterID)
 	if err != nil {
 		return errors.New("Unauthorized: You are not a member of this organization")
 	}
@@ -43,7 +43,7 @@ func InviteUserToOrg(ctx context.Context, inviterID string, orgID string, req In
 		return errors.New("Organization not found")
 	}
 
-	token, err := utils.GenerateMagicToken();
+	token, err := utils.GenerateMagicToken()
 	if err != nil {
 		return errors.New("Failed to Generate Secure Token")
 	}
@@ -59,6 +59,29 @@ func InviteUserToOrg(ctx context.Context, inviterID string, orgID string, req In
 	if err != nil {
 		log.Printf("Email Error: %v", err)
 		return errors.New("Failed to send invitation email")
+	}
+
+	return nil
+}
+
+func JoinOrganization(ctx context.Context, userID string, req JoinOrgrequest) error {
+	invitation, err := GetInvitationByToken(ctx, req.Token)
+	if err != nil {
+		return errors.New("Invalid or Expired invitation token")
+	}
+
+	if invitation.Status != "pending" {
+		return errors.New("This Invitation has already been used or rejected")
+	}
+
+	if time.Now().After(invitation.ExpiredAt) {
+		return errors.New("This Invitation has expired")
+	}
+
+	log.Printf("DEBUG: Invitation ID to update: [%s]", invitation.ID)
+	err = AcceptInvitation(ctx, invitation.ID, invitation.OrgID, userID, invitation.Role)
+	if err != nil {
+		return errors.New(err.Error())
 	}
 
 	return nil
