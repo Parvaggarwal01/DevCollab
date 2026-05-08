@@ -22,7 +22,7 @@ func RegisterUser(ctx context.Context, req RegisterRequest) (*User, error) {
 
 	otp := utils.GenerateOTP()
 
-	user, err := CreateUser(ctx, req.Email, string(hashedPassword))
+	user, err := CreateUser(ctx, req.FirstName, req.LastName, req.Email, string(hashedPassword))
 	if err != nil {
 		return nil, err
 	}
