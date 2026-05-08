@@ -66,3 +66,36 @@ func SendPasswordResetEmail(toEmail, otp string) error {
 
 	return smtp.SendMail(address, auth, from, []string{toEmail}, message)
 }
+
+func SendInvitationEmail(toEmail string, orgName string, token string) error {
+	from := configs.Env.SmtpUser
+	password := configs.Env.SmtpPassword
+	port := configs.Env.SmtpPort
+	host := configs.Env.SmtpHost
+
+	subject := fmt.Sprintf("Subject: You've been invited to join %s on DevCollab\n", orgName)
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+
+	inviteLink := fmt.Sprintf("http://localhost:3000/invite?token=%s", token)
+
+	body := fmt.Sprintf(`
+		<html>
+		<body style="font-family: Arial, sans-serif; padding: 20px;">
+			<h2>You have an invitation!</h2>
+			<p>You've been invited to collaborate in the <b>%s</b> workspace.</p>
+			<br/>
+			<a href="%s" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+				Accept Invitation
+			</a>
+			<p style="color: #888; font-size: 12px; margin-top: 30px;">This link will expire in 72 hours.</p>
+		</body>
+		</html>
+	`, orgName, inviteLink)
+
+	message := []byte(subject + mime + body)
+	auth := smtp.PlainAuth("", from, password, host)
+
+	address := fmt.Sprintf("%s:%s", host, port)
+
+	return smtp.SendMail(address, auth, from, []string{toEmail}, message)
+}

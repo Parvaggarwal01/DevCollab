@@ -3,6 +3,7 @@ package org
 import (
 	"context"
 	"devcollab/database"
+	"time"
 )
 
 func CreateOrganization(ctx context.Context, userID string, name string) (*Organization, error) {
@@ -90,4 +91,30 @@ func GetOrganizationsByUserID(ctx context.Context, userID string) ([]UserOrgResp
 	}
 
 	return orgs, nil
+}
+
+func GetMemberRole(ctx context.Context, orgID string, userID string) (string, error) {
+	var role string
+	query := `SELECT role from organization_members WHERE org_id = $1 AND user_id = $2`
+	err := database.Pool.QueryRow(ctx, query, orgID, userID).Scan(&role)
+	return role, err
+}
+
+func GetOrganizationByID(ctx context.Context, orgID string) (*Organization, error) {
+	var org Organization
+	query := `SELECT id, name, created_at, updated_at from organizations WHERE id = $1`
+	err := database.Pool.QueryRow(ctx, query, orgID).Scan(&org.ID, &org.Name, &org.CreatedAt, &org.UpdatedAt)
+	return &org, err
+}
+
+func CreateInvitation(ctx context.Context, orgID, inviterID, email, role, token string, expiresAt time.Time) error {
+	query := `
+				INSERT INTO organization_invitations (org_id, inviter_id, email, role, token, expires_at, status)
+				VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+				ON CONFLICT (org_id, email)
+				DO UPDATE SET token = EXCLUDED.token, expires_at = EXCLUDED.expires_at, status = 'pending', role = EXCLUDED.role
+	`
+
+	_, err := database.Pool.Exec(ctx, query, orgID, inviterID, email, role, token, expiresAt)
+	return err
 }
