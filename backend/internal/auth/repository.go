@@ -5,17 +5,19 @@ import (
 	"devcollab/database"
 )
 
-func CreateUser(ctx context.Context, email string, hashedPassword string) (*User, error) {
+func CreateUser(ctx context.Context, firstName, lastName, email string, hashedPassword string) (*User, error) {
 	query := `
-					INSERT INTO users (email, password_hash)
-					VALUES ($1, $2)
-					RETURNING id, email, is_verified, created_at, updated_at
+					INSERT INTO users (first_name, last_name, email, password_hash)
+					VALUES ($1, $2, $3, $4)
+					RETURNING id, first_name, last_name, email, is_verified, created_at, updated_at
 	`
 
 	var user User
 
-	err := database.Pool.QueryRow(ctx, query, email, hashedPassword).Scan(
+	err := database.Pool.QueryRow(ctx, query,firstName, lastName, email, hashedPassword).Scan(
 		&user.ID,
+		&user.FirstName,
+		&user.LastName,
 		&user.Email,
 		&user.IsVerified,
 		&user.CreatedAt,
