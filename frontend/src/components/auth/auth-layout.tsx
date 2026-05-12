@@ -16,8 +16,8 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
             <Image
               src="/logo.png"
               alt="DevCollab Logo"
-              width={48}
-              height={48}
+              width={110}
+              height={110}
               className="mb-4"
             />
           </Link>

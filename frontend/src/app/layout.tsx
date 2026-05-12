@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const metadata: Metadata = {
   title: "DevCollab | Collaborative Workspace",
@@ -30,9 +31,12 @@ export default function RootLayout({
       className={`${outfit.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
-        {children}
-        <Toaster position="top-right" richColors theme="dark" />
+        <TooltipProvider>
+          {children}
+          <Toaster position="top-right" richColors theme="dark" />
+        </TooltipProvider>
       </body>
+
     </html>
   );
 }
