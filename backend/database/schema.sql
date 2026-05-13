@@ -10,6 +10,8 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
 -- 2. Create the Organizations table
 CREATE TABLE organizations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
