@@ -16,8 +16,8 @@ type User struct {
 type RegisterRequest struct {
 	FirstName string `json:"first_name" binding:"required"`
 	LastName  string `json:"last_name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Email     string `json:"email" binding:"required,email"`
+	Password  string `json:"password" binding:"required,min=6"`
 }
 
 type LoginRequest struct {
@@ -53,4 +53,23 @@ type ResetPasswordResponse struct {
 	Email       string `json:"email" binding:"required,email"`
 	OTP         string `json:"otp" binding:"required,len=6"`
 	NewPassword string `json:"new_password" binding:"required,min=6"`
+}
+
+type GoogleUserInfo struct {
+	Email         string `json:"email"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	VerifiedEmail bool   `json:"verified_email"`
+}
+
+type GithubUserInfo struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	Login string `json:"login"`
+}
+
+type GithubEmail struct {
+	Email    string `json:"email"`
+	Primary  bool `json:"primary"`
+	Verified bool `json:"verified"`
 }

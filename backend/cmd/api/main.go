@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"devcollab/configs"
 	"devcollab/database"
 	"devcollab/internal/auth"
 	"devcollab/internal/org"
@@ -22,6 +23,8 @@ func main() {
 	redis.Connect()
 
 	router := gin.Default()
+
+	configs.InitOAuth()
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
@@ -42,6 +45,10 @@ func main() {
 		authGroup.POST("/register", auth.Register)
 		authGroup.POST("/verifyotp", auth.Verify)
 		authGroup.POST("/login", auth.Login)
+		authGroup.GET("/google/login", auth.GoogleLoginRedirect)
+		authGroup.GET("/github/login", auth.GithubLoginRedirect)
+		authGroup.GET("/google/callback", auth.GoogleCallback)
+		authGroup.GET("/github/callback", auth.GithubCallback)
 		authGroup.POST("/forgot-password", auth.ForgotPassword)
 		authGroup.POST("/reset-password", auth.ResetPasswordHandler)
 		authGroup.POST("/refresh", auth.RefreshToken)
