@@ -18,11 +18,22 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     headers,
   });
 
+  if (response.status === 401) {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+    throw new Error("Unauthorized");
+  }
+
   const data = await response.json();
 
   if (!response.ok) {
     throw new Error(data.error || "Something went wrong");
   }
+
 
   return data;
 }

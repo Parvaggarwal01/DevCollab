@@ -260,3 +260,14 @@ func GithubCallback(c *gin.Context){
 
 	c.Redirect(http.StatusTemporaryRedirect, frontendURL)
 }
+
+func GetMe(c * gin.Context) {
+	userID, _ := c.Get("userID")
+
+	user, err := GetUserByID(c.Request.Context(), userID.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user"})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}

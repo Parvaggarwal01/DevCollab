@@ -59,14 +59,7 @@ func main() {
 	apiGroup := router.Group("/api")
 	apiGroup.Use(auth.Protect())
 	{
-		apiGroup.GET("/me", func(c *gin.Context) {
-			userID, _ := c.Get("userID")
-
-			c.JSON(http.StatusOK, gin.H{
-				"message": "You are securely authenticated!",
-				"user_id": userID,
-			})
-		})
+		apiGroup.GET("/me", auth.GetMe)
 		apiGroup.POST("/auth/logout", auth.Logout)
 		apiGroup.POST("/orgs", org.CreateOrg)
 		apiGroup.GET("/orgs", org.GetUserOrgs)

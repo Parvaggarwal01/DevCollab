@@ -23,6 +23,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
 const navItems = [
   {
     title: "Organizations",
@@ -37,10 +44,25 @@ const navItems = [
 ];
 
 import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export function DashboardNavbar() {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const [user, setUser] = useState<UserProfile | null>(null)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await api.get<UserProfile>("/api/me");
+        setUser(data);
+      } catch (error) {
+        console.error("Failed to fetch user Profile", error)
+      }
+    }
+    fetchUser();
+  },[])
 
   return (
     <header className="fixed top-0 right-0 left-0 lg:left-16 z-30 flex h-16 items-center justify-between border-b border-[#2e2e2e] bg-[#111111]/80 px-4 md:px-8 backdrop-blur-md">
@@ -106,15 +128,15 @@ export function DashboardNavbar() {
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8 border border-[#2e2e2e]">
                 <AvatarImage src="" alt="User" />
-                <AvatarFallback className="bg-[#2e2e2e] text-xs text-white">PA</AvatarFallback>
+                <AvatarFallback className="bg-[#2e2e2e] text-xs text-white">{user ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase(): ".."}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 bg-[#1e1e1e] border-[#2e2e2e] text-white" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Parv Aggarwal</p>
-                <p className="text-xs leading-none text-muted-foreground">parv@example.com</p>
+                <p className="text-sm font-medium leading-none">{user ? `${user.first_name}${user.last_name}` : "Loading..."}</p>
+                <p className="text-xs leading-none text-muted-foreground">{user?.email || "..."}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-[#2e2e2e]" />
