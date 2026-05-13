@@ -20,7 +20,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface UserProfile {
@@ -30,26 +30,37 @@ interface UserProfile {
   email: string;
 }
 
-const navItems = [
-  {
-    title: "Organizations",
-    href: "/dashboard",
-    icon: Icons.search,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Icons.settings,
-  },
-];
-
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 
 export function DashboardNavbar() {
   const pathname = usePathname();
+  const { orgId } = useParams();
   const { logout } = useAuth();
+
+  const navItems = [
+    {
+      title: "Organizations",
+      href: "/dashboard",
+      icon: Icons.search,
+    },
+  ];
+
+  if (orgId) {
+    navItems.push({
+      title: "Team",
+      href: `/dashboard/${orgId}/team`,
+      icon: Icons.user,
+    });
+  }
+
+  navItems.push({
+    title: "Settings",
+    href: "/settings",
+    icon: Icons.settings,
+  });
+
   const [user, setUser] = useState<UserProfile | null>(null)
 
   useEffect(() => {

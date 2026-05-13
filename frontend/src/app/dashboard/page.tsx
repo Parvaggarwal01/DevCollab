@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 interface Organization {
   organization: {
@@ -166,10 +167,13 @@ export default function DashboardPage() {
                     <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-white px-0 h-auto">
                       Settings
                     </Button>
-                    <Button variant="outline" size="sm" className="text-xs border-[#2e2e2e] hover:bg-primary hover:text-white hover:border-primary">
-                      Go to Org
-                    </Button>
+                    <Link href={`/dashboard/${item.organization.id}/team`}>
+                      <Button variant="outline" size="sm" className="text-xs border-[#2e2e2e] hover:bg-primary hover:text-white hover:border-primary">
+                        Go to Org
+                      </Button>
+                    </Link>
                   </div>
+
                 </div>
               </div>
             ))

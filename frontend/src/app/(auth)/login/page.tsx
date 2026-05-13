@@ -34,7 +34,17 @@ export default function LoginPage() {
       localStorage.setItem("refresh_token", data.refresh_token);
       localStorage.setItem("user", JSON.stringify(data.user));
       
+      // Check for pending invitation
+      const pendingInvite = localStorage.getItem("pending_invite_token");
+      if (pendingInvite) {
+        localStorage.removeItem("pending_invite_token");
+        router.push(`/invite?token=${pendingInvite}`);
+        return;
+      }
+
+      
       router.push("/dashboard");
+
     } catch (error: any) {
       toast.error(error.message || "Login failed");
     } finally {

@@ -1,7 +1,7 @@
-  "use client";
+"use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/icons";
 import {
@@ -10,25 +10,35 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import Image from "next/image";
-
-const navItems = [
-  {
-    title: "Organizations",
-    href: "/dashboard",
-    icon: Icons.search, // Replace with appropriate icon later
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: Icons.settings,
-  },
-];
-
 import { useAuth } from "@/hooks/use-auth";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { orgId } = useParams();
   const { logout } = useAuth();
+
+  const navItems = [
+    {
+      title: "Organizations",
+      href: "/dashboard",
+      icon: Icons.search,
+    },
+  ];
+
+  if (orgId) {
+    navItems.push({
+      title: "Team",
+      href: `/dashboard/${orgId}/team`,
+      icon: Icons.user,
+    });
+  }
+
+  navItems.push({
+    title: "Settings",
+    href: "/settings",
+    icon: Icons.settings,
+  });
+
 
   return (
 

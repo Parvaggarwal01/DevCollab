@@ -18,8 +18,19 @@ export default function OAuthSuccessPage() {
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
       
+      // Check for pending invitation
+      const pendingInvite = localStorage.getItem("pending_invite_token");
+      if (pendingInvite) {
+        localStorage.removeItem("pending_invite_token");
+        toast.success("Login successful! Processing invitation...");
+        router.push(`/invite?token=${pendingInvite}`);
+        return;
+      }
+
+
       toast.success("Login successful!");
       router.push("/dashboard");
+
     } else {
       toast.error("OAuth login failed. Missing tokens.");
       router.push("/login");
