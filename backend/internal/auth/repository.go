@@ -14,7 +14,7 @@ func CreateUser(ctx context.Context, firstName, lastName, email string, hashedPa
 
 	var user User
 
-	err := database.Pool.QueryRow(ctx, query,firstName, lastName, email, hashedPassword).Scan(
+	err := database.Pool.QueryRow(ctx, query, firstName, lastName, email, hashedPassword).Scan(
 		&user.ID,
 		&user.FirstName,
 		&user.LastName,
@@ -72,4 +72,54 @@ func UpdateUserPassword(ctx context.Context, email string, newHashedPassword str
 	`
 	_, err := database.Pool.Exec(ctx, query, email, newHashedPassword)
 	return err
+}
+
+func GetOrCreateOAuthUser(ctx context.Context, email, firstName, lastName string) (*User, error) {
+	var user User
+
+	query := `SELECT id, email, first_name, last_name, is_verified, created_at FROM users WHERE email = $1`
+	err := database.Pool.QueryRow(ctx, query, email).Scan(
+		&user.ID,
+		&user.Email,
+		&user.FirstName,
+		&user.LastName,
+		&user.IsVerified,
+		&user.CreatedAt,
+	)
+
+
+	if err == nil {
+		return &user, nil
+	}
+
+	insertQuery := `INSERT INTO users (first_name, last_name, email, is_verified)
+					VALUES ($1, $2, $3, true) 
+					RETURNING id, email, first_name, last_name, is_verified, created_at`
+
+	err = database.Pool.QueryRow(ctx, insertQuery, firstName, lastName, email).Scan(
+		&user.ID,
+		&user.Email,
+		&user.FirstName,
+		&user.LastName,
+		&user.IsVerified,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func GetUserByID(ctx context.Context, id string) (*User, error) {
+    var user User
+    query := `SELECT id, first_name, last_name, email, created_at FROM users WHERE id = $1`
+    err := database.Pool.QueryRow(ctx, query, id).Scan(
+        &user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt,
+    )
+    if err != nil {
+        return nil, err
+    }
+    return &user, nil
 }

@@ -208,3 +208,34 @@ func LogoutUser(ctx context.Context, userID string) error {
 
 	return nil
 }
+
+func ProcessOAuthLogin(ctx context.Context, email, firstName, lastName string) (*LoginResponse, error) {
+	user, err := GetOrCreateOAuthUser(ctx, email, firstName, lastName);
+	
+	if err != nil {
+		return nil, errors.New("Failed to Get or Create User")
+	}
+
+	accessToken, refreshToken, err := jwt.GenerateToken(user.ID)
+
+	if err != nil {
+		return nil, errors.New("Failed to create Access Token and Refresh Token")
+	}
+
+	redisKey := "refresh_token:" + user.ID
+	// Invalidate old session
+	redis.Client.Del(ctx, redisKey)
+
+	// Store new session
+	err = redis.Client.Set(ctx, redisKey, refreshToken, 7*24*time.Hour).Err()
+	if err != nil {
+		log.Printf("Redis Error: Failed to Store OAuth Token on Redis %s", err)
+		return nil, errors.New("Failed to Save Session")
+	}
+
+	return &LoginResponse{
+		Token: accessToken,
+		RefreshToken: refreshToken,
+		User: *user,
+	}, nil
+}
