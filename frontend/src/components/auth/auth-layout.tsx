@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { GuestGuard } from "./guest-guard";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -9,7 +10,9 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ children, title, description }: AuthLayoutProps) {
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-[#111111] px-4 py-12">
+    <GuestGuard>
+      <div className="flex min-h-screen w-full flex-col items-center justify-center bg-[#111111] px-4 py-12">
+
       <div className="w-full max-w-[400px] space-y-6">
         <div className="flex flex-col items-center space-y-2 text-center">
           <Link href="/">
@@ -29,7 +32,10 @@ export function AuthLayout({ children, title, description }: AuthLayoutProps) {
           </p>
         </div>
         {children}
+        </div>
       </div>
-    </div>
+    </GuestGuard>
   );
 }
+
+
